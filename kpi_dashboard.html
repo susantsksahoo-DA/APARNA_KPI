@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>KPI Dashboard – Aparna Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0d14;--card:#1a1e30;--border:#252a3d;
+  --accent:#f5a623;--red:#e05c5c;--green:#3ecf8e;
+  --blue:#4a9eff;--purple:#7c5cfc;--yellow:#e8c838;
+  --text:#e8eaf2;--muted:#6e738f;--input-bg:#0e1020;--r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1a1e30,#0b0d14);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.hdr-brand{display:flex;align-items:center;gap:14px;}
+.hdr-logo{width:42px;height:42px;background:linear-gradient(135deg,#f5a623,#7c5cfc);border-radius:10px;display:grid;place-items:center;font-size:20px;}
+.hdr-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#f5a623,#7c5cfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.hdr-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hdr-nav a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;padding:7px 12px;border:1px solid var(--border);border-radius:8px;transition:.2s;white-space:nowrap;}
+.hdr-nav a:hover{color:var(--accent);border-color:var(--accent);}
+.hdr-nav a.active{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);}
+.hdr-nav .sep{width:1px;height:24px;background:var(--border);margin:0 2px;}
+.hdr-nav .grp{display:flex;gap:5px;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:4px 6px;}
+.hdr-nav .glbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 3px;}
+
+/* FILTER */
+.fsec{padding:24px 32px 0;}
+.ftitle{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.ftitle::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;}
+.frow{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.fg select{background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:.2s;min-width:165px;cursor:pointer;}
+.fg select:focus{border-color:var(--accent);}
+.fg select option{background:#1a1e30;}
+.fbtn{display:flex;gap:8px;}
+.btn{padding:10px 18px;border:none;border-radius:var(--r);cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:.03em;transition:.2s;}
+.b-apply{background:linear-gradient(135deg,var(--accent),#e8960a);color:#000;}
+.b-apply:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(245,166,35,.3);}
+.b-reset{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border);}
+.b-reset:hover{color:var(--text);}
+.b-ref{background:linear-gradient(135deg,#7c5cfc,#4a2fc0);color:#fff;}
+.b-ref:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(124,92,252,.3);}
+
+/* SUMMARY CARDS */
+.scards{display:flex;gap:14px;padding:22px 32px;flex-wrap:wrap;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;min-width:130px;position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.sc.c1::after{background:linear-gradient(90deg,#f5a623,#ff9f50);}
+.sc.c2::after{background:linear-gradient(90deg,#7c5cfc,#4a9eff);}
+.sc.c3::after{background:linear-gradient(90deg,#3ecf8e,#1a9c68);}
+.sc.c4::after{background:linear-gradient(90deg,#e8c838,#f5a623);}
+.sc.c5::after{background:linear-gradient(90deg,#3ecf8e,#7c5cfc);}
+.sc.c6::after{background:linear-gradient(90deg,#e05c5c,#f5a623);}
+.sc-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
+.sc-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+.sc-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* KPI WEIGHT BAR */
+.kbar{display:flex;gap:0;padding:0 32px 20px;}
+.kb{flex:1;padding:10px 8px;border:1px solid var(--border);background:var(--card);text-align:center;position:relative;}
+.kb:first-child{border-radius:10px 0 0 10px;}
+.kb:last-child{border-radius:0 10px 10px 0;}
+.kb+.kb{border-left:none;}
+.kb::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kb.k1::before{background:#f5a623;}.kb.k2::before{background:#4a9eff;}.kb.k3::before{background:#3ecf8e;}
+.kb.k4::before{background:#e05c5c;}.kb.k5::before{background:#e8c838;}.kb.k6::before{background:#7c5cfc;}
+.kb.kt::before{background:linear-gradient(90deg,#f5a623,#7c5cfc);}
+.kb-w{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--accent);}
+.kb-n{font-size:10px;color:var(--muted);font-weight:600;margin-top:2px;}
+
+/* TABLE */
+.tsec{padding:0 32px 80px;}
+.thdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.ttitle{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:8px;}
+.ttitle::before{content:'';width:3px;height:16px;background:var(--accent);border-radius:2px;}
+.tcount{font-size:12px;color:var(--muted);}
+.twrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:12px;}
+thead tr.r1{background:#080b12;}
+thead tr.r2{background:#0e1020;}
+th{padding:9px 10px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;}
+th.tl{text-align:left;}
+td{padding:10px 10px;vertical-align:middle;border-bottom:1px solid rgba(37,42,61,.45);text-align:center;}
+td.tl{text-align:left;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(245,166,35,.03);}
+/* Column group separators */
+.gs{border-left:1px solid #252a3d !important;}
+.gs2{border-left:2px solid #7c5cfc !important;}
+/* Group header colors */
+.gh1{background:rgba(245,166,35,.07)!important;}
+.gh2{background:rgba(74,158,255,.07)!important;}
+.gh3{background:rgba(62,207,142,.07)!important;}
+.gh4{background:rgba(224,92,92,.07)!important;}
+.gh5{background:rgba(232,200,56,.07)!important;}
+.gh6{background:rgba(124,92,252,.07)!important;}
+.ghtot{background:rgba(124,92,252,.12)!important;}
+
+/* PILLS */
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;min-width:30px;text-align:center;}
+.pg{background:rgba(62,207,142,.15);color:#3ecf8e;border:1px solid rgba(62,207,142,.3);}
+.pb{background:rgba(74,158,255,.15);color:#4a9eff;border:1px solid rgba(74,158,255,.3);}
+.py{background:rgba(232,200,56,.15);color:#e8c838;border:1px solid rgba(232,200,56,.3);}
+.po{background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.3);}
+.pr{background:rgba(224,92,92,.15);color:#e05c5c;border:1px solid rgba(224,92,92,.3);}
+.tpill{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;}
+
+/* STATUS PILL */
+.sp-good{background:rgba(62,207,142,.15);color:#3ecf8e;border:1px solid rgba(62,207,142,.3);padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.sp-avg{background:rgba(232,200,56,.15);color:#e8c838;border:1px solid rgba(232,200,56,.3);padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.sp-poor{background:rgba(224,92,92,.15);color:#e05c5c;border:1px solid rgba(224,92,92,.3);padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+
+/* PROGRESS BAR */
+.pb-wrap{display:flex;align-items:center;gap:5px;min-width:90px;}
+.pb-track{height:5px;flex:1;background:rgba(255,255,255,.07);border-radius:3px;}
+.pb-fill{height:100%;border-radius:3px;}
+.pb-val{font-size:11px;font-weight:700;min-width:32px;text-align:right;}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;display:none;}
+.ei{font-size:48px;margin-bottom:14px;}
+.em{font-family:'Syne',sans-serif;font-size:15px;color:var(--muted);}
+.es{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.7;max-width:400px;margin-left:auto;margin-right:auto;}
+
+/* LOADING */
+.loading{display:none;position:fixed;inset:0;z-index:300;background:rgba(11,13,20,.88);backdrop-filter:blur(5px);place-items:center;}
+.loading.show{display:grid;}
+.lcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 52px;text-align:center;}
+.lsp{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ltxt{font-family:'Syne',sans-serif;font-size:14px;color:var(--muted);}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:999;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:600;transform:translateY(80px);opacity:0;transition:.35s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:360px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--green);color:#000;}
+.toast.err{background:#e05c5c;color:#fff;}
+
+@media(max-width:900px){
+  .fsec,.scards,.kbar,.tsec{padding-left:14px;padding-right:14px;}
+  .sc,.kb{min-width:100px;}
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loadEl"><div class="lcard"><div class="lsp"></div><div class="ltxt" id="ltxt">Loading KPI…</div></div></div>
+<div class="toast" id="toastEl"></div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">🏆</div>
+    <div>
+      <div class="hdr-title">KPI Dashboard</div>
+      <div class="hdr-sub">Aparna Store · Employee Performance Index</div>
+    </div>
+  </div>
+  <nav class="hdr-nav">
+    <div class="grp">
+      <span class="glbl">✂️ Grooming</span>
+      <a href="grooming_form.html">➕ Entry</a>
+      <a href="grooming_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">⚠️ Indiscipline</span>
+      <a href="indiscipline_form.html">➕ Entry</a>
+      <a href="indiscipline_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">🏪 VM</span>
+      <a href="vm_form.html">➕ Entry</a>
+      <a href="vm_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <a href="kpi_dashboard.html" class="active">🏆 KPI</a>
+  </nav>
+</header>
+
+<!-- FILTERS -->
+<div class="fsec">
+  <div class="ftitle">Filter</div>
+  <div class="frow">
+    <div class="fg"><label>Month</label>
+      <select id="fMonth"><option value="">All Months</option></select></div>
+    <div class="fg"><label>Site Name</label>
+      <select id="fSite"><option value="">All Sites</option></select></div>
+    <div class="fg"><label>Floor</label>
+      <select id="fFloor"><option value="">All Floors</option></select></div>
+    <div class="fg"><label>Employee</label>
+      <select id="fEmp"><option value="">All Employees</option></select></div>
+    <div class="fg"><label>Status</label>
+      <select id="fStatus">
+        <option value="">All Status</option>
+        <option>Good</option><option>Average</option><option>Poor</option>
+      </select></div>
+    <div class="fg" style="justify-content:flex-end;">
+      <label>&nbsp;</label>
+      <div class="fbtn">
+        <button class="btn b-apply" onclick="applyFilter()">🔍 Apply</button>
+        <button class="btn b-reset" onclick="resetFilter()">↺ Reset</button>
+        <button class="btn b-ref"   onclick="loadData()">🔄 Refresh</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KPI WEIGHT BAR -->
+<div class="kbar" style="margin-top:20px;">
+  <div class="kb k1"><div class="kb-w" style="color:#f5a623;">50</div><div class="kb-n">Sales Value</div></div>
+  <div class="kb k2"><div class="kb-w" style="color:#4a9eff;">10</div><div class="kb-n">Sales Qty</div></div>
+  <div class="kb k3"><div class="kb-w" style="color:#3ecf8e;">20</div><div class="kb-n">Attendance</div></div>
+  <div class="kb k4"><div class="kb-w" style="color:#e05c5c;">5</div><div class="kb-n">Grooming</div></div>
+  <div class="kb k5"><div class="kb-w" style="color:#e8c838;">5</div><div class="kb-n">Discipline</div></div>
+  <div class="kb k6"><div class="kb-w" style="color:#7c5cfc;">10</div><div class="kb-n">VM</div></div>
+  <div class="kb kt"><div class="kb-w" style="color:var(--accent);">100</div><div class="kb-n">Total</div></div>
+</div>
+
+<!-- SUMMARY CARDS -->
+<div class="scards">
+  <div class="sc c1"><div class="sc-num" id="sEmp">0</div><div class="sc-lbl">Employees</div><div class="sc-sub">In current filter</div></div>
+  <div class="sc c2"><div class="sc-num" id="sAvg">—</div><div class="sc-lbl">Avg KPI Score</div><div class="sc-sub">Out of 100</div></div>
+  <div class="sc c3"><div class="sc-num" id="sTop">—</div><div class="sc-lbl">Top Score</div><div class="sc-sub">Best performer</div></div>
+  <div class="sc c4"><div class="sc-num" id="sSales">—</div><div class="sc-lbl">Avg Sales Ach%</div><div class="sc-sub">Value achievement</div></div>
+  <div class="sc c5"><div class="sc-num" id="sGood">0</div><div class="sc-lbl">Good Status</div><div class="sc-sub">Score ≥ 85</div></div>
+  <div class="sc c6"><div class="sc-num" id="sPoor">0</div><div class="sc-lbl">Poor Status</div><div class="sc-sub">Score &lt; 60</div></div>
+</div>
+
+<!-- TABLE -->
+<div class="tsec">
+  <div class="thdr">
+    <div class="ttitle">Employee KPI Scorecard</div>
+    <span class="tcount" id="tcount"></span>
+  </div>
+  <div class="twrap">
+    <table id="kpiTbl">
+      <thead>
+        <tr class="r1">
+          <th rowspan="2" class="tl" style="min-width:30px;">#</th>
+          <th rowspan="2" class="tl" style="min-width:90px;">Month</th>
+          <th rowspan="2" class="tl" style="min-width:90px;">Site</th>
+          <th rowspan="2" class="tl" style="min-width:80px;">Floor</th>
+          <th rowspan="2" class="tl" style="min-width:130px;">Employee</th>
+          <th rowspan="2" style="min-width:50px;">Code</th>
+          <!-- Attendance group -->
+          <th colspan="5" class="gh3 gs" style="min-width:60px;">Attendance</th>
+          <!-- Sales Target group -->
+          <th colspan="4" class="gh1 gs">Sales Target</th>
+          <!-- Sales Achieved group -->
+          <th colspan="4" class="gh2 gs">Sales Achieved</th>
+          <!-- Behaviour -->
+          <th colspan="3" class="gh4 gs">Behaviour</th>
+          <!-- KPI Scores -->
+          <th colspan="6" class="gh6 gs">KPI Scores</th>
+          <!-- Result -->
+          <th colspan="3" class="ghtot gs2">Result</th>
+        </tr>
+        <tr class="r2">
+          <!-- Attendance -->
+          <th class="gh3 gs">Days</th><th class="gh3">Present</th><th class="gh3">Absent</th><th class="gh3">Late</th><th class="gh3">Early Out</th>
+          <!-- Sales Target -->
+          <th class="gh1 gs">Tgt Value</th><th class="gh1">Tgt Qty</th><th class="gh1">Tgt ATV</th><th class="gh1">Tgt ABS</th>
+          <!-- Sales Achieved -->
+          <th class="gh2 gs">Ach Value</th><th class="gh2">Ach Qty</th><th class="gh2">Val Ach%</th><th class="gh2">Qty Ach%</th>
+          <!-- Behaviour -->
+          <th class="gh4 gs">Grooming🔴</th><th class="gh4">Indiscipline⚠️</th><th class="gh4">VM🏪</th>
+          <!-- KPI Scores -->
+          <th class="gh6 gs" title="Sales Value /50">S1/50</th>
+          <th class="gh6" title="Sales Qty /10">S2/10</th>
+          <th class="gh6" title="Attendance /20">S3/20</th>
+          <th class="gh6" title="Grooming /5">S4/5</th>
+          <th class="gh6" title="Discipline /5">S5/5</th>
+          <th class="gh6" title="VM /10">S6/10</th>
+          <!-- Result -->
+          <th class="ghtot gs2">KPI Score</th>
+          <th class="ghtot">Grade</th>
+          <th class="ghtot">Status</th>
+        </tr>
+      </thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+  <div class="empty" id="emptyMsg">
+    <div class="ei">📊</div>
+    <div class="em">No data found</div>
+    <div class="es">
+      Make sure:<br/>
+      • Sheet name is exactly <b style="color:var(--accent);">KPI</b><br/>
+      • Column headers match exactly (KEY, MONTH NAME, SITE NAME, FLOOR, NAME, CODE…)<br/>
+      • Data rows exist with valid MONTH NAME and NAME<br/>
+      • Click 🔄 Refresh after adding data to the sheet
+    </div>
+  </div>
+</div>
+
+<script>
+const URL = "https://script.google.com/macros/s/AKfycbyQpg_9FkN1v9IyWPhbTnp73kHrzC0OjEO_sKhha5Q9WLmYuJUFYke60Uunv-wHSWtC/exec";
+
+let ALL = [], EMPS = [], FILTERED = [];
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", loadData);
+
+async function loadData() {
+  showLoad("Loading KPI data from sheet…");
+  try {
+    const r = await fetch(URL + "?action=getKPIData&t=" + Date.now());
+    const d = await r.json();
+    if (d.error) { showToast("❌ " + d.error, "err"); showEmpty(); hideLoad(); return; }
+    ALL  = d.records   || [];
+    EMPS = d.employees || [];
+    buildDropdowns(d);
+    applyFilter();
+    showToast("✅ " + ALL.length + " records loaded", "ok");
+  } catch(e) {
+    showToast("❌ " + e.message, "err");
+    showEmpty();
+  }
+  hideLoad();
+}
+
+// ── DROPDOWNS ─────────────────────────────────────────────────
+function buildDropdowns(d) {
+  fill("fMonth", d.months,    m => m,   m => m);
+  fill("fSite",  d.sites,     s => s,   s => s);
+  fill("fFloor", d.floors,    f => f,   f => f);
+  fill("fEmp",   d.employees, e => e.name, e => e.name + " (" + e.code + ")");
+
+  // Cascade site → employees & floors
+  g("fSite").addEventListener("change", () => {
+    const site = g("fSite").value;
+    const fe   = site ? EMPS.filter(e => e.site===site) : EMPS;
+    fill("fEmp", fe, e => e.name, e => e.name+" ("+e.code+")");
+    g("fFloor").value = "";
+  });
+  g("fFloor").addEventListener("change", () => {
+    const site=g("fSite").value, fl=g("fFloor").value;
+    const fe = EMPS.filter(e=>(!site||e.site===site)&&(!fl||e.floor===fl));
+    fill("fEmp", fe, e=>e.name, e=>e.name+" ("+e.code+")");
+  });
+}
+
+function fill(id, items, valFn, txtFn) {
+  const el  = g(id), prev = el.value;
+  const opt = el.options[0]; // keep "All" option
+  el.innerHTML = "";
+  el.appendChild(opt);
+  items.forEach(item => {
+    const o = document.createElement("option");
+    o.value = valFn(item); o.textContent = txtFn(item);
+    el.appendChild(o);
+  });
+  el.value = prev; // restore
+}
+
+// ── FILTER ────────────────────────────────────────────────────
+function applyFilter() {
+  const mon    = g("fMonth").value;
+  const site   = g("fSite").value;
+  const floor  = g("fFloor").value;
+  const emp    = g("fEmp").value;
+  const status = g("fStatus").value;
+
+  FILTERED = ALL.filter(r =>
+    (!mon    || r.month  === mon)    &&
+    (!site   || r.site   === site)   &&
+    (!floor  || r.floor  === floor)  &&
+    (!emp    || r.name   === emp)    &&
+    (!status || r.status.toLowerCase() === status.toLowerCase())
+  );
+  updateCards();
+  renderTable();
+}
+
+function resetFilter() {
+  ["fMonth","fSite","fFloor","fEmp","fStatus"].forEach(id => g(id).value = "");
+  fill("fEmp", EMPS, e=>e.name, e=>e.name+" ("+e.code+")");
+  applyFilter();
+}
+
+// ── SUMMARY CARDS ─────────────────────────────────────────────
+function updateCards() {
+  const rows = FILTERED;
+  g("sEmp").textContent = rows.length;
+  if (!rows.length) {
+    ["sAvg","sTop","sSales"].forEach(id => g(id).textContent = "—");
+    g("sGood").textContent = "0"; g("sPoor").textContent = "0";
+    return;
+  }
+  const avg  = (rows.reduce((s,r)=>s+r.kpiScore,0)/rows.length).toFixed(1);
+  const top  = Math.max(...rows.map(r=>r.kpiScore));
+  const sAvg = rows.filter(r=>r.tgtValue>0).length
+    ? (rows.filter(r=>r.tgtValue>0).reduce((s,r)=>s+r.valPct,0)/rows.filter(r=>r.tgtValue>0).length).toFixed(0)+"%"
+    : "—";
+  g("sAvg").textContent  = avg;
+  g("sTop").textContent  = top;
+  g("sSales").textContent= sAvg;
+  g("sGood").textContent = rows.filter(r=>r.kpiScore>=85).length;
+  g("sPoor").textContent = rows.filter(r=>r.kpiScore<60).length;
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────────
+function renderTable() {
+  const tbody = g("tBody"), empty = g("emptyMsg"), tbl = g("kpiTbl");
+  if (!FILTERED.length) { tbody.innerHTML=""; empty.style.display="block"; tbl.style.display="none"; g("tcount").textContent=""; return; }
+  empty.style.display = "none"; tbl.style.display = "";
+  g("tcount").textContent = FILTERED.length + " record" + (FILTERED.length!==1?"s":"");
+
+  const rows = [...FILTERED].sort((a,b) =>
+    a.month.localeCompare(b.month)||a.site.localeCompare(b.site)||a.floor.localeCompare(b.floor)||a.name.localeCompare(b.name)
+  );
+
+  tbody.innerHTML = rows.map((r,i) => {
+    const vc = pColor(r.valPct), qc = pColor(r.qtyPct), ac = pColor(r.attPct);
+    return `<tr>
+      <td class="tl" style="color:var(--muted);font-size:11px;">${i+1}</td>
+      <td class="tl" style="color:var(--accent);font-weight:700;white-space:nowrap;">${r.month}</td>
+      <td class="tl" style="white-space:nowrap;">${r.site}</td>
+      <td class="tl">${r.floor}</td>
+      <td class="tl" style="font-weight:600;white-space:nowrap;">${r.name}</td>
+      <td style="color:var(--muted);font-size:11px;">${r.code}</td>
+
+      <!-- Attendance -->
+      <td class="gs">${r.monthDays}</td>
+      <td style="color:#3ecf8e;font-weight:600;">${r.presentDays}</td>
+      <td style="color:${r.absentDays>0?"#e05c5c":"var(--muted)"};">${r.absentDays}</td>
+      <td style="color:${r.lateComing>0?"#e8c838":"var(--muted)"};">${r.lateComing||0}</td>
+      <td style="color:${r.earlyExit>0?"#f5a623":"var(--muted)"};">${r.earlyExit||0}</td>
+
+      <!-- Sales Target -->
+      <td class="gs">${fmtM(r.tgtValue)}</td>
+      <td>${r.tgtQty||"—"}</td>
+      <td>${fmtM(r.tgtATV)||"—"}</td>
+      <td>${r.tgtABS||"—"}</td>
+
+      <!-- Sales Achieved -->
+      <td class="gs">${fmtM(r.achValue)}</td>
+      <td>${r.achQty||0}</td>
+      <td>${pBar(r.valPct,vc)}</td>
+      <td>${pBar(r.qtyPct,qc)}</td>
+
+      <!-- Behaviour -->
+      <td class="gs" style="color:${r.grooming>0?"#e05c5c":"#3ecf8e"};font-weight:700;">${r.grooming}</td>
+      <td style="color:${r.indiscipline>0?"#e8c838":"#3ecf8e"};font-weight:700;">${r.indiscipline}</td>
+      <td style="color:${r.vm>0?"#7c5cfc":"var(--muted)"};">${r.vm}</td>
+
+      <!-- KPI Scores -->
+      <td class="gs">${spill(r.s1,50)}</td>
+      <td>${spill(r.s2,10)}</td>
+      <td>${spill(r.s3,20)}</td>
+      <td>${spill(r.s4,5)}</td>
+      <td>${spill(r.s5,5)}</td>
+      <td>${spill(r.s6,10)}</td>
+
+      <!-- Result -->
+      <td class="gs2">${totalPill(r.kpiScore)}</td>
+      <td>${grade(r.kpiScore)}</td>
+      <td>${statusPill(r.status)}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── FORMATTERS ────────────────────────────────────────────────
+function g(id){ return document.getElementById(id); }
+
+function pColor(p){
+  return p>=100?"#3ecf8e":p>=85?"#4a9eff":p>=70?"#e8c838":p>=50?"#f5a623":"#e05c5c";
+}
+function pBar(pct,col){
+  const w=Math.min(pct||0,100);
+  return `<div class="pb-wrap"><div class="pb-track"><div class="pb-fill" style="width:${w}%;background:${col};"></div></div><span class="pb-val" style="color:${col};">${pct}%</span></div>`;
+}
+function spill(score,max){
+  const r=max>0?score/max:0;
+  const c=r>=1?"pg":r>=.8?"pb":r>=.6?"py":r>=.4?"po":"pr";
+  return `<span class="pill ${c}">${score}</span>`;
+}
+function totalPill(score){
+  const c=score>=85?"pg":score>=70?"pb":score>=60?"py":score>=50?"po":"pr";
+  return `<span class="pill tpill ${c}">${score}</span>`;
+}
+function grade(s){
+  const g=s>=85?"A":s>=70?"B":s>=60?"C":s>=50?"D":"F";
+  const c=s>=85?"#3ecf8e":s>=70?"#4a9eff":s>=60?"#e8c838":s>=50?"#f5a623":"#e05c5c";
+  return `<span style="color:${c};font-weight:800;font-family:'Syne',sans-serif;font-size:15px;">${g}</span>`;
+}
+function statusPill(st){
+  const s=String(st||"").trim();
+  if (!s) return `<span style="color:var(--muted);">—</span>`;
+  const sl=s.toLowerCase();
+  if (sl==="good")    return `<span class="sp-good">${s}</span>`;
+  if (sl==="average") return `<span class="sp-avg">${s}</span>`;
+  if (sl==="poor")    return `<span class="sp-poor">${s}</span>`;
+  return `<span class="sp-avg">${s}</span>`;
+}
+function fmtM(n){
+  if (!n||n===0) return "—";
+  if (n>=10000000) return "₹"+(n/10000000).toFixed(2)+"Cr";
+  if (n>=100000)   return "₹"+(n/100000).toFixed(1)+"L";
+  if (n>=1000)     return "₹"+(n/1000).toFixed(0)+"K";
+  return "₹"+n;
+}
+function showEmpty(){ g("emptyMsg").style.display="block"; g("kpiTbl").style.display="none"; }
+function showLoad(t){ g("ltxt").textContent=t; g("loadEl").classList.add("show"); }
+function hideLoad(){ g("loadEl").classList.remove("show"); }
+let _t;
+function showToast(m,tp="ok"){ const e=g("toastEl"); e.textContent=m; e.className="toast "+tp+" show"; clearTimeout(_t); _t=setTimeout(()=>e.classList.remove("show"),5000); }
+</script>
+</body>
+</html>

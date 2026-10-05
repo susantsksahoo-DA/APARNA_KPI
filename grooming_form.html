@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Grooming Entry – Aparna Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #0b0d14;
+  --surface:  #131624;
+  --card:     #1a1e30;
+  --border:   #252a3d;
+  --accent:   #f5a623;
+  --red:      #e05c5c;
+  --green:    #3ecf8e;
+  --text:     #e8eaf2;
+  --muted:    #6e738f;
+  --input-bg: #0e1020;
+  --r:        10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,#1a1e30 0%,#0b0d14 100%);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.hdr-brand{display:flex;align-items:center;gap:14px;}
+.hdr-logo{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:20px;}
+.hdr-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.hdr-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hdr-nav a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;padding:7px 12px;border:1px solid var(--border);border-radius:8px;transition:.2s;white-space:nowrap;}
+.hdr-nav a:hover{color:var(--accent);border-color:var(--accent);}
+.hdr-nav a.active{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);}
+.hdr-nav .sep{width:1px;height:24px;background:var(--border);margin:0 2px;}
+.hdr-nav .grp{display:flex;gap:5px;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:4px 6px;}
+.hdr-nav .glbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 3px;}
+
+/* ── WRAPPER ── */
+.wrap{max-width:780px;margin:0 auto;padding:40px 24px 80px;}
+
+.page-title{
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
+  margin-bottom:4px;
+}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:32px;}
+
+/* ── CARD ── */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:28px 32px;margin-bottom:20px;
+}
+.card-title{
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:22px;display:flex;align-items:center;gap:8px;
+}
+.card-title::before{
+  content:'';width:3px;height:16px;background:var(--accent);border-radius:2px;display:block;
+}
+
+/* ── GRID ── */
+.grid{display:grid;gap:18px;}
+.grid-2{grid-template-columns:1fr 1fr;}
+.grid-3{grid-template-columns:1fr 1fr 1fr;}
+@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+/* ── FIELD ── */
+.field{display:flex;flex-direction:column;gap:6px;}
+label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+input,select,textarea{
+  background:var(--input-bg);border:1px solid var(--border);
+  color:var(--text);border-radius:var(--r);padding:11px 14px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  transition:.2s;outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,.12);}
+select{cursor:pointer;}
+select option{background:var(--card);}
+textarea{resize:vertical;min-height:80px;}
+
+/* Readonly / auto fields */
+.auto-field{
+  background:linear-gradient(135deg,rgba(245,166,35,.08),rgba(245,166,35,.04));
+  border-color:rgba(245,166,35,.3);color:var(--accent);font-weight:600;
+  cursor:default;
+}
+
+/* ── PHOTO UPLOAD ── */
+.photo-zone{
+  border:2px dashed var(--border);border-radius:12px;
+  padding:28px;text-align:center;cursor:pointer;transition:.25s;
+  background:var(--input-bg);position:relative;
+}
+.photo-zone:hover{border-color:var(--accent);background:rgba(245,166,35,.04);}
+.photo-zone.has-photo{border-color:var(--green);border-style:solid;}
+.photo-zone input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.photo-icon{font-size:36px;margin-bottom:10px;}
+.photo-label{font-size:13px;color:var(--muted);}
+.photo-label strong{color:var(--accent);}
+.photo-preview{
+  display:none;width:100%;max-height:200px;object-fit:contain;
+  border-radius:8px;margin-top:14px;
+}
+.photo-remove{
+  display:none;margin-top:10px;background:rgba(224,92,92,.15);
+  border:1px solid var(--red);color:var(--red);border-radius:8px;
+  padding:6px 14px;font-size:12px;cursor:pointer;font-weight:600;
+  transition:.2s;
+}
+.photo-remove:hover{background:var(--red);color:#fff;}
+
+/* ── FLAG TOGGLE ── */
+.flag-toggle{display:flex;gap:10px;}
+.flag-btn{
+  flex:1;padding:12px;border-radius:10px;border:2px solid var(--border);
+  background:var(--input-bg);color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:.2s;text-align:center;
+}
+.flag-btn.red.active{background:rgba(224,92,92,.15);border-color:var(--red);color:var(--red);}
+.flag-btn.green.active{background:rgba(62,207,142,.15);border-color:var(--green);color:var(--green);}
+.flag-btn:hover{border-color:var(--muted);}
+
+/* ── SUBMIT ── */
+.submit-btn{
+  width:100%;padding:16px;border:none;
+  background:linear-gradient(135deg,var(--accent),#e8960a);
+  color:#000;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;
+  border-radius:12px;cursor:pointer;letter-spacing:.04em;
+  transition:.25s;position:relative;overflow:hidden;
+}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,166,35,.3);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.submit-btn .spinner{
+  display:none;width:18px;height:18px;border:2px solid rgba(0,0,0,.3);
+  border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;
+  margin:0 auto;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:30px;right:30px;z-index:999;
+  padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;
+  transform:translateY(100px);opacity:0;
+  transition:.4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;
+  display:flex;align-items:center;gap:10px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);color:#000;}
+.toast.error  {background:var(--red);color:#fff;}
+
+/* ── LOADING OVERLAY ── */
+.loading-wrap{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(11,13,20,.8);backdrop-filter:blur(4px);
+  place-items:center;
+}
+.loading-wrap.show{display:grid;}
+.loading-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:40px 50px;text-align:center;
+}
+.ld-spinner{
+  width:48px;height:48px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 16px;
+}
+.ld-text{font-family:'Syne',sans-serif;font-size:15px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo" style="background:linear-gradient(135deg,#f5a623,#e05c5c)">✂️</div>
+    <div>
+      <div class="hdr-title" style="background:linear-gradient(90deg,#f5a623,#ff9f50);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Grooming Manager</div>
+      <div class="hdr-sub">Aparna Store · Staff Grooming System</div>
+    </div>
+  </div>
+  <nav class="hdr-nav">
+    <div class="grp">
+      <span class="glbl">✂️ Grooming</span>
+      <a href="grooming_form.html" class="active">➕ Entry</a>
+      <a href="grooming_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">⚠️ Indiscipline</span>
+      <a href="indiscipline_form.html">➕ Entry</a>
+      <a href="indiscipline_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">🏪 VM</span>
+      <a href="vm_form.html">➕ Entry</a>
+      <a href="vm_approval.html">📋 Dashboard</a>
+    </div>
+  
+    <div class="sep"></div>
+    <a href="kpi_dashboard.html">🏆 KPI</a>
+  </nav>
+</header>
+
+<!-- LOADING -->
+<div class="loading-wrap" id="loadingWrap">
+  <div class="loading-card">
+    <div class="ld-spinner"></div>
+    <div class="ld-text" id="loadingText">Loading master data…</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="wrap">
+  <div class="page-title">New Grooming Entry</div>
+  <div class="page-sub">Fill all fields and capture/upload the employee photo before submitting.</div>
+
+  <!-- SECTION 1: RECORD INFO -->
+  <div class="card">
+    <div class="card-title">Record Information</div>
+    <div class="grid grid-3">
+      <div class="field">
+        <label>Record ID</label>
+        <input class="auto-field" id="recId" readonly placeholder="Auto-generating…"/>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="recDate"/>
+      </div>
+      <div class="field">
+        <label>Month / Year</label>
+        <input class="auto-field" id="recMonthYear" readonly/>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: EMPLOYEE -->
+  <div class="card">
+    <div class="card-title">Employee Details</div>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Site Name</label>
+        <select id="siteName"><option value="">— Select Site —</option></select>
+      </div>
+      <div class="field">
+        <label>Floor</label>
+        <select id="floor" disabled><option value="">— Select Floor —</option></select>
+      </div>
+      <div class="field">
+        <label>Employee Name</label>
+        <select id="empName" disabled><option value="">— Select Employee —</option></select>
+      </div>
+      <div class="field">
+        <label>Employee Code</label>
+        <input class="auto-field" id="empCode" readonly placeholder="Auto-filled"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: GROOMING -->
+  <div class="card">
+    <div class="card-title">Grooming Details</div>
+    <div class="grid">
+      <div class="field">
+        <label>Grooming Flag</label>
+        <div class="flag-toggle">
+          <button type="button" class="flag-btn red" onclick="setFlag('RED')">🔴 RED</button>
+          <button type="button" class="flag-btn green" onclick="setFlag('GREEN')">🟢 GREEN</button>
+        </div>
+        <input type="hidden" id="groomingFlag"/>
+      </div>
+      <div class="field">
+        <label>Reason</label>
+        <select id="reason">
+          <option value="">— Select Reason —</option>
+          <option>NO UNIFORM</option>
+          <option>HAIR STYLE</option>
+          <option>SHAVING</option>
+          <option>ACCESSORIES</option>
+          <option>OTHERS</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Comments</label>
+        <textarea id="comments" placeholder="Add any additional observations…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: PHOTO -->
+  <div class="card">
+    <div class="card-title">Employee Photo</div>
+    <div class="photo-zone" id="photoZone">
+      <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhoto(event)"/>
+      <div class="photo-icon" id="photoIcon">📷</div>
+      <div class="photo-label" id="photoLabelText">
+        <strong>Tap to capture or upload</strong><br/>
+        <span>JPG, PNG · Max 5 MB</span>
+      </div>
+      <img id="photoPreview" class="photo-preview"/>
+      <button type="button" class="photo-remove" id="photoRemove" onclick="removePhoto()">✕ Remove Photo</button>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+    <span id="submitLabel">SUBMIT GROOMING ENTRY</span>
+    <div class="spinner" id="submitSpinner"></div>
+  </button>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQpg_9FkN1v9IyWPhbTnp73kHrzC0OjEO_sKhha5Q9WLmYuJUFYke60Uunv-wHSWtC/exec";
+// Replace above with your deployed Apps Script URL
+
+let masterEmployees = [];
+let selectedFlag    = "";
+let photoBase64     = "";
+let photoMime       = "";
+
+// ── INIT ─────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", async () => {
+  setToday();
+  showLoading("Loading master data…");
+  await loadNextId();
+  await loadMasterData();
+  hideLoading();
+});
+
+function setToday() {
+  const d    = new Date();
+  const yyyy = d.getFullYear();
+  const mm   = String(d.getMonth()+1).padStart(2,"0");
+  const dd   = String(d.getDate()).padStart(2,"0");
+  document.getElementById("recDate").value = `${yyyy}-${mm}-${dd}`;
+  updateMonthYear();
+  document.getElementById("recDate").addEventListener("change", updateMonthYear);
+}
+
+function updateMonthYear() {
+  const val = document.getElementById("recDate").value;
+  if (!val) return;
+  const d   = new Date(val + "T00:00:00");
+  const mon = d.toLocaleString("en-US",{month:"short"}).toUpperCase();
+  const yr  = d.getFullYear();
+  document.getElementById("recMonthYear").value = `${mon}_${yr}`;
+}
+
+async function loadNextId() {
+  try {
+    const r = await fetch(`${APPS_SCRIPT_URL}?action=getNextId`);
+    const j = await r.json();
+    document.getElementById("recId").value = j.id || "GR-0001";
+  } catch(e) {
+    document.getElementById("recId").value = "GR-0001";
+  }
+}
+
+async function loadMasterData() {
+  try {
+    const r  = await fetch(`${APPS_SCRIPT_URL}?action=getMasterData`);
+    const j  = await r.json();
+    masterEmployees = j.employees || [];
+
+    const siteEl = document.getElementById("siteName");
+    (j.sites||[]).sort().forEach(s => {
+      const o = document.createElement("option");
+      o.value = o.textContent = s;
+      siteEl.appendChild(o);
+    });
+
+    siteEl.addEventListener("change", onSiteChange);
+    document.getElementById("floor").addEventListener("change", onFloorChange);
+    document.getElementById("empName").addEventListener("change", onEmpChange);
+  } catch(e) {
+    showToast("⚠️ Could not load master data – check script URL", "error");
+  }
+}
+
+// ── CASCADING DROPDOWNS ──────────────────────────────
+function onSiteChange() {
+  const site    = document.getElementById("siteName").value;
+  const floorEl = document.getElementById("floor");
+  floorEl.innerHTML = "<option value=''>— Select Floor —</option>";
+  floorEl.disabled  = true;
+  document.getElementById("empName").innerHTML = "<option value=''>— Select Employee —</option>";
+  document.getElementById("empName").disabled  = true;
+  document.getElementById("empCode").value = "";
+
+  if (!site) return;
+  const floors = [...new Set(
+    masterEmployees.filter(e => e.site === site).map(e => e.floor)
+  )].sort();
+  floors.forEach(f => {
+    const o = document.createElement("option");
+    o.value = o.textContent = f;
+    floorEl.appendChild(o);
+  });
+  floorEl.disabled = false;
+}
+
+function onFloorChange() {
+  const site    = document.getElementById("siteName").value;
+  const floor   = document.getElementById("floor").value;
+  const empEl   = document.getElementById("empName");
+  empEl.innerHTML = "<option value=''>— Select Employee —</option>";
+  empEl.disabled  = true;
+  document.getElementById("empCode").value = "";
+
+  if (!floor) return;
+  const emps = masterEmployees
+    .filter(e => e.site === site && e.floor === floor)
+    .sort((a,b) => a.name.localeCompare(b.name));
+
+  emps.forEach(e => {
+    const o = document.createElement("option");
+    o.value = e.name; o.dataset.code = e.code;
+    o.textContent = e.name;
+    empEl.appendChild(o);
+  });
+  empEl.disabled = false;
+}
+
+function onEmpChange() {
+  const sel = document.getElementById("empName");
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById("empCode").value = opt ? (opt.dataset.code || "") : "";
+}
+
+// ── FLAG TOGGLE ──────────────────────────────────────
+function setFlag(f) {
+  selectedFlag = f;
+  document.getElementById("groomingFlag").value = f;
+  document.querySelectorAll(".flag-btn").forEach(b => b.classList.remove("active"));
+  const btn = f === "RED"
+    ? document.querySelector(".flag-btn.red")
+    : document.querySelector(".flag-btn.green");
+  btn.classList.add("active");
+}
+
+// ── PHOTO HANDLING ───────────────────────────────────
+function handlePhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showToast("Photo too large – max 5 MB", "error"); return;
+  }
+  photoMime = file.type;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const result    = ev.target.result;
+    photoBase64     = result.split(",")[1];
+    const preview   = document.getElementById("photoPreview");
+    preview.src     = result;
+    preview.style.display = "block";
+    document.getElementById("photoIcon").style.display      = "none";
+    document.getElementById("photoLabelText").style.display = "none";
+    document.getElementById("photoRemove").style.display    = "block";
+    document.getElementById("photoZone").classList.add("has-photo");
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  photoBase64 = ""; photoMime = "";
+  document.getElementById("photoInput").value = "";
+  document.getElementById("photoPreview").style.display    = "none";
+  document.getElementById("photoIcon").style.display       = "";
+  document.getElementById("photoLabelText").style.display  = "";
+  document.getElementById("photoRemove").style.display     = "none";
+  document.getElementById("photoZone").classList.remove("has-photo");
+}
+
+// ── SUBMIT ───────────────────────────────────────────
+async function submitForm() {
+  // Validate
+  const id       = document.getElementById("recId").value;
+  const date     = document.getElementById("recDate").value;
+  const siteName = document.getElementById("siteName").value;
+  const floor    = document.getElementById("floor").value;
+  const name     = document.getElementById("empName").value;
+  const code     = document.getElementById("empCode").value;
+  const flag     = document.getElementById("groomingFlag").value;
+  const reason   = document.getElementById("reason").value;
+  const comments = document.getElementById("comments").value;
+  const monthYear= document.getElementById("recMonthYear").value;
+
+  if (!siteName || !floor || !name || !flag || !reason || !date) {
+    showToast("⚠️ Please fill all required fields", "error"); return;
+  }
+
+  setBusy(true);
+
+  const payload = {
+    action: "submitGrooming",
+    id, date, siteName, floor, name, code,
+    groomingFlag: flag, reason, comments, monthYear,
+    photoBase64, photoMime
+  };
+
+  try {
+    const r = await fetch(APPS_SCRIPT_URL, {
+      method:"POST", redirect:"follow",
+      headers:{"Content-Type":"text/plain"},
+      body:JSON.stringify(payload)
+    });
+    const text = await r.text();
+    let j;
+    try { j = JSON.parse(text); } catch(pe) { showToast("❌ Server response error: "+text.substring(0,80),"error"); setBusy(false); return; }
+    if (j.success) {
+      showToast(`✅ ${id} submitted successfully! Email sent to admin.`, "success");
+      setTimeout(() => resetForm(), 2500);
+    } else {
+      showToast("❌ Submission failed: " + (j.error||"Unknown error"), "error");
+    }
+  } catch(e) {
+    showToast("❌ Network error – " + e.message, "error");
+  }
+  setBusy(false);
+}
+
+async function resetForm() {
+  document.getElementById("siteName").value = "";
+  document.getElementById("floor").innerHTML  = "<option value=''>— Select Floor —</option>";
+  document.getElementById("floor").disabled   = true;
+  document.getElementById("empName").innerHTML= "<option value=''>— Select Employee —</option>";
+  document.getElementById("empName").disabled = true;
+  document.getElementById("empCode").value    = "";
+  document.getElementById("reason").value     = "";
+  document.getElementById("comments").value   = "";
+  document.getElementById("groomingFlag").value = "";
+  document.querySelectorAll(".flag-btn").forEach(b => b.classList.remove("active"));
+  removePhoto();
+  setToday();
+  await loadNextId();
+}
+
+// ── UI HELPERS ───────────────────────────────────────
+function setBusy(on) {
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = on;
+  document.getElementById("submitLabel").style.display = on ? "none" : "block";
+  document.getElementById("submitSpinner").style.display = on ? "block" : "none";
+}
+
+function showLoading(msg) {
+  document.getElementById("loadingText").textContent = msg;
+  document.getElementById("loadingWrap").classList.add("show");
+}
+function hideLoading() {
+  document.getElementById("loadingWrap").classList.remove("show");
+}
+
+let toastTimer;
+function showToast(msg, type="success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className   = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove("show"); }, 4000);
+}
+</script>
+</body>
+</html>

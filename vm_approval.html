@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VM Dashboard – Aparna Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0b0d14;--surface:#131624;--card:#1a1e30;--border:#252a3d;--accent:#7c5cfc;--red:#e05c5c;--green:#3ecf8e;--yellow:#e8c838;--text:#e8eaf2;--muted:#6e738f;--input-bg:#0e1020;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.hdr{background:linear-gradient(135deg,#1a1e30 0%,#0b0d14 100%);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.hdr-brand{display:flex;align-items:center;gap:14px;}
+.hdr-logo{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:20px;}
+.hdr-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.hdr-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hdr-nav a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;padding:7px 12px;border:1px solid var(--border);border-radius:8px;transition:.2s;white-space:nowrap;}
+.hdr-nav a:hover{color:var(--accent);border-color:var(--accent);}
+.hdr-nav a.active{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);}
+.hdr-nav .sep{width:1px;height:24px;background:var(--border);margin:0 2px;}
+.hdr-nav .grp{display:flex;gap:5px;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:4px 6px;}
+.hdr-nav .glbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 3px;}
+.stats{display:flex;gap:16px;padding:24px 32px;flex-wrap:wrap;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 22px;flex:1;min-width:150px;}
+.stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+.stat.all .stat-num{color:#7c5cfc;}.stat.pending .stat-num{color:var(--yellow);}.stat.done .stat-num{color:var(--green);}
+.filter-bar{display:flex;align-items:center;gap:10px;padding:0 32px 18px;flex-wrap:wrap;}
+.tab{padding:9px 20px;border-radius:30px;font-size:13px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:.2s;}
+.tab.active{border-color:#7c5cfc;color:#7c5cfc;background:rgba(124,92,252,.1);}
+.tab.pending.active{border-color:var(--yellow);color:var(--yellow);background:rgba(232,200,56,.1);}
+.tab.done.active{border-color:var(--green);color:var(--green);background:rgba(62,207,142,.1);}
+.search-box{margin-left:auto;background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:220px;transition:.2s;}
+.search-box:focus{border-color:#7c5cfc;}
+.table-wrap{padding:0 32px 60px;overflow-x:auto;}
+.data-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+.data-table thead tr{background:#111420;}
+.data-table th{padding:12px 14px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.data-table td{padding:12px 14px;font-size:13px;vertical-align:middle;border-bottom:1px solid rgba(37,42,61,.6);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tbody tr:hover{background:rgba(124,92,252,.04);}
+.badge{padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;white-space:nowrap;}
+.badge-purple{background:rgba(124,92,252,.18);color:#7c5cfc;border:1px solid rgba(124,92,252,.3);}
+.badge-green{background:rgba(62,207,142,.18);color:#3ecf8e;border:1px solid rgba(62,207,142,.3);}
+.badge-yellow{background:rgba(232,200,56,.18);color:#e8c838;border:1px solid rgba(232,200,56,.3);}
+.badge-gray{background:rgba(110,115,143,.18);color:#8b90ab;border:1px solid rgba(110,115,143,.3);}
+.photo-thumb{width:34px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:.2s;margin-right:3px;}
+.photo-thumb:hover{transform:scale(1.15);border-color:#7c5cfc;}
+.no-photo{width:34px;height:34px;background:var(--input-bg);border-radius:6px;border:1px solid var(--border);display:inline-grid;place-items:center;font-size:14px;color:var(--muted);}
+.stars-display{color:#f5a623;font-size:13px;letter-spacing:1px;}
+.act-btn{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:.2s;font-family:'DM Sans',sans-serif;}
+.act-rate{background:rgba(124,92,252,.15);color:#7c5cfc;border:1px solid rgba(124,92,252,.3);}
+.act-rate:hover{background:#7c5cfc;color:#fff;}
+.act-done{font-size:18px;cursor:default;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(11,13,20,.85);backdrop-filter:blur(6px);place-items:center;}
+.modal-overlay.show{display:grid;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:32px;width:min(540px,95vw);animation:modalIn .3s cubic-bezier(.34,1.56,.64,1);max-height:90vh;overflow-y:auto;}
+@keyframes modalIn{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:18px;}
+.modal-emp{background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:13px;}
+.modal-emp-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.modal-emp-row:last-child{margin-bottom:0;}
+.modal-emp-key{color:var(--muted);}
+.modal-photos{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.modal-photo-img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;}
+.modal-field{margin-bottom:16px;}
+.modal-field label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.modal-field select,.modal-field textarea{width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:.2s;}
+.modal-field select:focus,.modal-field textarea:focus{border-color:#7c5cfc;}
+/* Modal star rating */
+.modal-stars{display:flex;gap:10px;padding:6px 0;}
+.modal-star{font-size:32px;cursor:pointer;transition:.2s;opacity:.3;user-select:none;}
+.modal-star.active{opacity:1;}
+.modal-star:hover{transform:scale(1.2);}
+.modal-rating-label{font-size:13px;color:var(--muted);margin-top:6px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px;}
+.modal-cancel{padding:10px 22px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:.2s;}
+.modal-cancel:hover{border-color:var(--muted);color:var(--text);}
+.modal-submit{padding:10px 24px;background:linear-gradient(135deg,#7c5cfc,#4a2fc0);border:none;color:#fff;border-radius:9px;cursor:pointer;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:.03em;transition:.2s;}
+.modal-submit:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,92,252,.4);}
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.92);place-items:center;cursor:zoom-out;}
+.lightbox.show{display:grid;}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:12px;}
+.empty{text-align:center;padding:70px 20px;color:var(--muted);}
+.empty-icon{font-size:48px;margin-bottom:14px;}
+.empty-text{font-family:'Syne',sans-serif;font-size:16px;}
+.toast{position:fixed;bottom:30px;right:30px;z-index:500;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;transform:translateY(100px);opacity:0;transition:.4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);color:#000;}
+.toast.error{background:var(--red);color:#fff;}
+.loading-wrap{display:none;position:fixed;inset:0;z-index:200;background:rgba(11,13,20,.8);backdrop-filter:blur(4px);place-items:center;}
+.loading-wrap.show{display:grid;}
+.loading-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 50px;text-align:center;}
+.ld-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:#7c5cfc;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ld-text{font-family:'Syne',sans-serif;font-size:15px;color:var(--muted);}
+@media(max-width:700px){.stats{padding:16px;}.filter-bar{padding:0 16px 14px;}.table-wrap{padding:0 10px 60px;}.search-box{width:100%;margin-left:0;}}
+</style>
+</head>
+<body>
+
+<div class="loading-wrap" id="loadingWrap"><div class="loading-card"><div class="ld-spinner"></div><div class="ld-text">Loading VM records…</div></div></div>
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="ratingModal">
+  <div class="modal">
+    <div class="modal-title">🏪 Update VM Rating & Status</div>
+    <div class="modal-emp" id="modalEmpInfo"></div>
+    <div class="modal-photos" id="modalPhotos"></div>
+    <div class="modal-field">
+      <label>Status</label>
+      <select id="modalStatus">
+        <option value="">— Select Status —</option>
+        <option value="DONE">✅ Done</option>
+        <option value="PENDING">⏳ Pending</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>VM Rating by HR (1–5)</label>
+      <div class="modal-stars" id="modalStars">
+        <span class="modal-star" data-val="1" onclick="setModalRating(1)">⭐</span>
+        <span class="modal-star" data-val="2" onclick="setModalRating(2)">⭐</span>
+        <span class="modal-star" data-val="3" onclick="setModalRating(3)">⭐</span>
+        <span class="modal-star" data-val="4" onclick="setModalRating(4)">⭐</span>
+        <span class="modal-star" data-val="5" onclick="setModalRating(5)">⭐</span>
+      </div>
+      <div class="modal-rating-label" id="modalRatingLabel">Not rated</div>
+    </div>
+    <div class="modal-field"><label>HR Remarks</label><textarea id="modalRemarks" rows="3" placeholder="Enter remarks…"></textarea></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-submit" onclick="submitRating()">SAVE RATING</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg"/></div>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo" style="background:linear-gradient(135deg,#7c5cfc,#4a2fc0)">🏪</div>
+    <div>
+      <div class="hdr-title" style="background:linear-gradient(90deg,#7c5cfc,#b39dfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">VM Dashboard</div>
+      <div class="hdr-sub">Aparna Store · Visual Merchandising</div>
+    </div>
+  </div>
+  <nav class="hdr-nav">
+    <div class="grp">
+      <span class="glbl">✂️ Grooming</span>
+      <a href="grooming_form.html">➕ Entry</a>
+      <a href="grooming_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">⚠️ Indiscipline</span>
+      <a href="indiscipline_form.html">➕ Entry</a>
+      <a href="indiscipline_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">🏪 VM</span>
+      <a href="vm_form.html">➕ Entry</a>
+      <a href="vm_approval.html" class="active">📋 Dashboard</a>
+    </div>
+  
+    <div class="sep"></div>
+    <a href="kpi_dashboard.html">🏆 KPI</a>
+  </nav>
+</header>
+
+<div class="stats">
+  <div class="stat all"><div class="stat-num" id="statAll">0</div><div class="stat-lbl">Total VM Records</div></div>
+  <div class="stat pending"><div class="stat-num" id="statPending">0</div><div class="stat-lbl">Pending</div></div>
+  <div class="stat done"><div class="stat-num" id="statDone">0</div><div class="stat-lbl">Done</div></div>
+  <div class="stat all"><div class="stat-num" id="statAvgRating">–</div><div class="stat-lbl">Avg HR Rating</div></div>
+</div>
+
+<div class="filter-bar">
+  <button class="tab active" onclick="setTab('all',this)">All</button>
+  <button class="tab pending" onclick="setTab('pending',this)">⏳ Pending</button>
+  <button class="tab done" onclick="setTab('done',this)">✅ Done</button>
+  <input class="search-box" id="searchBox" placeholder="🔍 Search name, site, ID…" oninput="renderTable()"/>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Date</th><th>Site</th><th>Floor</th><th>Employee</th><th>Code</th>
+        <th>Status</th><th>VM Photos</th><th>HR Rating</th><th>Remarks</th><th>Mark</th><th>Month</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="empty" id="emptyState" style="display:none;"><div class="empty-icon">📭</div><div class="empty-text">No VM records found</div></div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQpg_9FkN1v9IyWPhbTnp73kHrzC0OjEO_sKhha5Q9WLmYuJUFYke60Uunv-wHSWtC/exec";
+const MODULE = "VM";
+let allRecords=[], currentTab="all", currentRow=null, modalRating=0;
+
+window.addEventListener("DOMContentLoaded", loadData);
+
+async function loadData() {
+  showLoading();
+  try {
+    const r=await fetch(`${APPS_SCRIPT_URL}?action=getVMData&module=${MODULE}`);
+    const j=await r.json();
+    allRecords=j.records||[];
+    updateStats(); renderTable();
+  } catch(e){showToast("❌ Failed to load data","error");}
+  hideLoading();
+}
+function updateStats() {
+  const total=allRecords.length;
+  const pending=allRecords.filter(r=>String(r["STATUS"]||"").toUpperCase()==="PENDING").length;
+  const done=allRecords.filter(r=>String(r["STATUS"]||"").toUpperCase()==="DONE").length;
+  const rated=allRecords.filter(r=>Number(r["VM RATING BY HR"])>0);
+  const avg=rated.length ? (rated.reduce((s,r)=>s+Number(r["VM RATING BY HR"]),0)/rated.length).toFixed(1) : "–";
+  document.getElementById("statAll").textContent=total;
+  document.getElementById("statPending").textContent=pending;
+  document.getElementById("statDone").textContent=done;
+  document.getElementById("statAvgRating").textContent=avg;
+}
+function setTab(tab,el){currentTab=tab;document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));el.classList.add("active");renderTable();}
+function renderTable(){
+  const search=document.getElementById("searchBox").value.toLowerCase();
+  let rows=allRecords;
+  if(currentTab==="pending") rows=rows.filter(r=>String(r["STATUS"]||"").toUpperCase()==="PENDING");
+  else if(currentTab==="done") rows=rows.filter(r=>String(r["STATUS"]||"").toUpperCase()==="DONE");
+  if(search) rows=rows.filter(r=>String(r["ID"]||"").toLowerCase().includes(search)||String(r["NAME"]||"").toLowerCase().includes(search)||String(r["SITE NAME"]||"").toLowerCase().includes(search));
+  const tbody=document.getElementById("tableBody"),empty=document.getElementById("emptyState");
+  if(!rows.length){tbody.innerHTML="";empty.style.display="block";return;}
+  empty.style.display="none";
+  const statusBadge=s=>{const v=String(s||"").toUpperCase();return v==="DONE"?`<span class="badge badge-green">✅ Done</span>`:`<span class="badge badge-yellow">⏳ Pending</span>`;};
+  const starsHtml=n=>{const v=Number(n)||0;return v>0?"⭐".repeat(v)+` <small style='color:var(--muted)'>(${v})</small>`:`<span style='color:var(--muted)'>Not rated</span>`;};
+  const photoCell=(url,label)=>url&&String(url).startsWith("http")
+    ?`<img src="${url}" class="photo-thumb" onclick="openLightbox('${url}')" title="${label}"/>`
+    :`<span class="no-photo" title="No photo">📷</span>`;
+  tbody.innerHTML=rows.map(r=>{
+    const dateStr=r["DATE"]?new Date(r["DATE"]).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"—";
+    const isDone=String(r["STATUS"]||"").toUpperCase()==="DONE";
+    const action=!isDone
+      ?`<button class="act-btn act-rate" onclick='openModal(${JSON.stringify(r)})'>⭐ Rate</button>`
+      :`<span class="act-done" title="Rated">✔️</span>`;
+    return `<tr>
+      <td style="color:#7c5cfc;font-weight:700;">${r["ID"]||""}</td>
+      <td style="white-space:nowrap;">${dateStr}</td>
+      <td>${r["SITE NAME"]||""}</td><td>${r["FLOOR"]||""}</td>
+      <td style="font-weight:600;">${r["NAME"]||""}</td>
+      <td style="color:var(--muted);">${r["CODE"]||""}</td>
+      <td>${statusBadge(r["STATUS"])}</td>
+      <td style="white-space:nowrap;">
+        ${photoCell(r["VM_PHOTO1_URL"],"VM Photo 1")}
+        ${photoCell(r["VM_PHOTO2_URL"],"VM Photo 2")}
+        ${photoCell(r["VM_PHOTO3_URL"],"VM Photo 3")}
+      </td>
+      <td>${starsHtml(r["VM RATING BY HR"])}</td>
+      <td style="max-width:160px;color:var(--muted);font-size:12px;">${r["REMARKS"]||"—"}</td>
+      <td>${Number(r["MARK"])===1?'<span class="badge badge-green">1</span>':'<span class="badge badge-gray">0</span>'}</td>
+      <td style="white-space:nowrap;">${r["MONTH_YEAR"]||""}</td>
+      <td>${action}</td>
+    </tr>`;
+  }).join("");
+}
+function openModal(record){
+  currentRow=record; modalRating=Number(record["VM RATING BY HR"])||0;
+  document.getElementById("modalEmpInfo").innerHTML=`
+    <div class="modal-emp-row"><span class="modal-emp-key">Record</span><span style="color:#7c5cfc;font-weight:700;">${record.ID}</span></div>
+    <div class="modal-emp-row"><span class="modal-emp-key">Employee</span><span>${record.NAME} (${record.CODE})</span></div>
+    <div class="modal-emp-row"><span class="modal-emp-key">Site / Floor</span><span>${record["SITE NAME"]} / ${record.FLOOR}</span></div>
+    <div class="modal-emp-row"><span class="modal-emp-key">Current Status</span><span>${record.STATUS||"PENDING"}</span></div>
+    ${record.COMMENTS?`<div class="modal-emp-row"><span class="modal-emp-key">Comments</span><span>${record.COMMENTS}</span></div>`:""}`;
+  const mp=document.getElementById("modalPhotos");
+  mp.innerHTML=["VM_PHOTO1_URL","VM_PHOTO2_URL","VM_PHOTO3_URL"].map((k,i)=>
+    record[k]&&String(record[k]).startsWith("http")
+      ?`<img src="${record[k]}" class="modal-photo-img" onclick="openLightbox('${record[k]}')" title="VM Photo ${i+1}"/>`
+      :""
+  ).join("");
+  document.getElementById("modalStatus").value=record["STATUS"]||"";
+  setModalRating(modalRating);
+  document.getElementById("modalRemarks").value=record["REMARKS"]||"";
+  document.getElementById("ratingModal").classList.add("show");
+}
+function setModalRating(val){
+  modalRating=val;
+  const labels=["","★ Poor","★★ Fair","★★★ Good","★★★★ Very Good","★★★★★ Excellent"];
+  document.getElementById("modalRatingLabel").textContent=val>0?labels[val]:"Not rated";
+  document.querySelectorAll(".modal-star").forEach(s=>s.classList.toggle("active",Number(s.dataset.val)<=val));
+}
+function closeModal(){document.getElementById("ratingModal").classList.remove("show");currentRow=null;}
+async function submitRating(){
+  const status=document.getElementById("modalStatus").value;
+  const remarks=document.getElementById("modalRemarks").value.trim();
+  if(!status){showToast("⚠️ Please select a status","error");return;}
+  const btn=document.querySelector(".modal-submit");
+  btn.disabled=true;btn.textContent="Saving…";
+  try{
+    const r=await fetch(APPS_SCRIPT_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"rateVM",module:MODULE,row:currentRow["_row"],status,vmRating:modalRating,remarks})});
+    const text=await r.text();
+    let j; try{j=JSON.parse(text);}catch(pe){showToast("❌ Server error: "+text.substring(0,60),"error");btn.disabled=false;btn.textContent="SAVE RATING";return;}
+    if(j.success){showToast("✅ VM rating saved! Email sent.","success");closeModal();await loadData();}
+    else showToast("❌ Failed: "+(j.error||"Unknown"),"error");
+  }catch(e){showToast("❌ Network error: "+e.message,"error");}
+  btn.disabled=false;btn.textContent="SAVE RATING";
+}
+function openLightbox(url){document.getElementById("lightboxImg").src=url;document.getElementById("lightbox").classList.add("show");}
+function closeLightbox(){document.getElementById("lightbox").classList.remove("show");}
+function showLoading(){document.getElementById("loadingWrap").classList.add("show");}
+function hideLoading(){document.getElementById("loadingWrap").classList.remove("show");}
+let tt;
+function showToast(msg,type="success"){const t=document.getElementById("toast");t.textContent=msg;t.className=`toast ${type} show`;clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),4500);}
+document.getElementById("ratingModal").addEventListener("click",function(e){if(e.target===this)closeModal();});
+</script>
+</body>
+</html>

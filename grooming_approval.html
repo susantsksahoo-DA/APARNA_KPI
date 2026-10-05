@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Grooming Approval Dashboard – Aparna Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0d14;--surface:#131624;--card:#1a1e30;
+  --border:#252a3d;--accent:#f5a623;--red:#e05c5c;
+  --green:#3ecf8e;--yellow:#e8c838;--text:#e8eaf2;
+  --muted:#6e738f;--input-bg:#0e1020;--r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,#1a1e30 0%,#0b0d14 100%);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.hdr-brand{display:flex;align-items:center;gap:14px;}
+.hdr-logo{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:20px;}
+.hdr-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.hdr-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hdr-nav a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;padding:7px 12px;border:1px solid var(--border);border-radius:8px;transition:.2s;white-space:nowrap;}
+.hdr-nav a:hover{color:var(--accent);border-color:var(--accent);}
+.hdr-nav a.active{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);}
+.hdr-nav .sep{width:1px;height:24px;background:var(--border);margin:0 2px;}
+.hdr-nav .grp{display:flex;gap:5px;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:4px 6px;}
+.hdr-nav .glbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 3px;}
+
+/* ── STATS BAR ── */
+.stats{display:flex;gap:16px;padding:24px 32px;flex-wrap:wrap;}
+.stat{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:16px 22px;flex:1;min-width:150px;
+}
+.stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+.stat.all    .stat-num{color:var(--accent);}
+.stat.pending .stat-num{color:var(--yellow);}
+.stat.approved .stat-num{color:var(--green);}
+.stat.rejected .stat-num{color:var(--red);}
+
+/* ── FILTER TABS ── */
+.filter-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:0 32px 18px;flex-wrap:wrap;
+}
+.tab{
+  padding:9px 20px;border-radius:30px;font-size:13px;font-weight:600;
+  border:1px solid var(--border);background:transparent;color:var(--muted);
+  cursor:pointer;transition:.2s;
+}
+.tab:hover{color:var(--text);border-color:var(--muted);}
+.tab.active{border-color:var(--accent);color:var(--accent);background:rgba(245,166,35,.1);}
+.tab.pending.active  {border-color:var(--yellow);color:var(--yellow);background:rgba(232,200,56,.1);}
+.tab.approved.active {border-color:var(--green);color:var(--green);background:rgba(62,207,142,.1);}
+.tab.rejected.active {border-color:var(--red);color:var(--red);background:rgba(224,92,92,.1);}
+
+.search-box{
+  margin-left:auto;background:var(--input-bg);border:1px solid var(--border);
+  color:var(--text);border-radius:8px;padding:9px 14px;font-size:13px;
+  font-family:'DM Sans',sans-serif;outline:none;width:220px;
+  transition:.2s;
+}
+.search-box:focus{border-color:var(--accent);}
+
+/* ── TABLE WRAP ── */
+.table-wrap{padding:0 32px 60px;overflow-x:auto;}
+.data-table{
+  width:100%;border-collapse:collapse;
+  background:var(--card);border-radius:14px;overflow:hidden;
+  border:1px solid var(--border);
+}
+.data-table thead tr{background:#111420;}
+.data-table th{
+  padding:12px 14px;font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.07em;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+.data-table td{
+  padding:13px 14px;font-size:13px;vertical-align:middle;
+  border-bottom:1px solid rgba(37,42,61,.6);
+}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tbody tr{transition:.15s;}
+.data-table tbody tr:hover{background:rgba(245,166,35,.04);}
+
+/* ── BADGES ── */
+.badge{
+  padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  display:inline-block;white-space:nowrap;
+}
+.badge-red    {background:rgba(224,92,92,.18);color:#e05c5c;border:1px solid rgba(224,92,92,.3);}
+.badge-green  {background:rgba(62,207,142,.18);color:#3ecf8e;border:1px solid rgba(62,207,142,.3);}
+.badge-yellow {background:rgba(232,200,56,.18);color:#e8c838;border:1px solid rgba(232,200,56,.3);}
+.badge-gray   {background:rgba(110,115,143,.18);color:#8b90ab;border:1px solid rgba(110,115,143,.3);}
+
+/* ── PHOTO THUMB ── */
+.photo-thumb{
+  width:40px;height:40px;object-fit:cover;border-radius:8px;
+  border:1px solid var(--border);cursor:pointer;transition:.2s;
+}
+.photo-thumb:hover{transform:scale(1.1);border-color:var(--accent);}
+.no-photo{width:40px;height:40px;background:var(--input-bg);border-radius:8px;
+  border:1px solid var(--border);display:grid;place-items:center;font-size:16px;color:var(--muted);}
+
+/* ── ACTION BUTTONS ── */
+.act-btn{
+  padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;
+  cursor:pointer;border:none;transition:.2s;font-family:'DM Sans',sans-serif;
+}
+.act-approve{background:rgba(62,207,142,.15);color:var(--green);border:1px solid rgba(62,207,142,.3);}
+.act-approve:hover{background:var(--green);color:#000;}
+.act-reject {background:rgba(224,92,92,.15);color:var(--red);border:1px solid rgba(224,92,92,.3);}
+.act-reject:hover {background:var(--red);color:#fff;}
+.act-done{font-size:18px;cursor:default;}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(11,13,20,.85);backdrop-filter:blur(6px);
+  place-items:center;
+}
+.modal-overlay.show{display:grid;}
+.modal{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;padding:32px;width:min(520px,95vw);
+  animation:modalIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-title{
+  font-family:'Syne',sans-serif;font-size:18px;font-weight:800;
+  margin-bottom:20px;display:flex;align-items:center;gap:10px;
+}
+.modal-emp{
+  background:var(--input-bg);border:1px solid var(--border);
+  border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;
+}
+.modal-emp-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.modal-emp-row:last-child{margin-bottom:0;}
+.modal-emp-key{color:var(--muted);}
+.modal-photo{
+  width:100%;max-height:200px;object-fit:contain;
+  border-radius:10px;border:1px solid var(--border);margin-bottom:16px;
+}
+.modal-field{margin-bottom:16px;}
+.modal-field label{display:block;font-size:12px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.modal-field select,.modal-field textarea{
+  width:100%;background:var(--input-bg);border:1px solid var(--border);
+  color:var(--text);border-radius:var(--r);padding:11px 14px;
+  font-family:'DM Sans',sans-serif;font-size:14px;outline:none;
+  transition:.2s;
+}
+.modal-field select:focus,.modal-field textarea:focus{border-color:var(--accent);}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px;}
+.modal-cancel{
+  padding:10px 22px;background:transparent;border:1px solid var(--border);
+  color:var(--muted);border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:600;transition:.2s;
+}
+.modal-cancel:hover{border-color:var(--muted);color:var(--text);}
+.modal-submit{
+  padding:10px 24px;background:linear-gradient(135deg,var(--accent),#e8960a);
+  border:none;color:#000;border-radius:9px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
+  letter-spacing:.03em;transition:.2s;
+}
+.modal-submit:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(245,166,35,.3);}
+
+/* ── PHOTO LIGHTBOX ── */
+.lightbox{
+  display:none;position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.92);place-items:center;cursor:zoom-out;
+}
+.lightbox.show{display:grid;}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:12px;}
+
+/* ── EMPTY ── */
+.empty{
+  text-align:center;padding:70px 20px;color:var(--muted);
+}
+.empty-icon{font-size:48px;margin-bottom:14px;}
+.empty-text{font-family:'Syne',sans-serif;font-size:16px;color:var(--muted);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:30px;right:30px;z-index:500;
+  padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;
+  transform:translateY(100px);opacity:0;transition:.4s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;display:flex;align-items:center;gap:10px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);color:#000;}
+.toast.error  {background:var(--red);color:#fff;}
+
+/* ── LOADING ── */
+.loading-wrap{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(11,13,20,.8);backdrop-filter:blur(4px);place-items:center;
+}
+.loading-wrap.show{display:grid;}
+.loading-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 50px;text-align:center;}
+.ld-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ld-text{font-family:'Syne',sans-serif;font-size:15px;color:var(--muted);}
+
+@media(max-width:700px){
+  .stats{padding:16px;}.filter-bar{padding:0 16px 14px;}.table-wrap{padding:0 10px 60px;}
+  .search-box{width:100%;margin-left:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-wrap" id="loadingWrap">
+  <div class="loading-card">
+    <div class="ld-spinner"></div>
+    <div class="ld-text">Loading records…</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- APPROVAL MODAL -->
+<div class="modal-overlay" id="approvalModal">
+  <div class="modal">
+    <div class="modal-title">📋 HR Review &amp; Decision</div>
+    <div class="modal-emp" id="modalEmpInfo"></div>
+    <img id="modalPhoto" class="modal-photo" style="display:none"/>
+    <div class="modal-field">
+      <label>HR Decision</label>
+      <select id="modalDecision">
+        <option value="">— Select Decision —</option>
+        <option value="YES">✅ Approve</option>
+        <option value="NO">❌ Reject</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>HR Reason / Remarks</label>
+      <textarea id="modalReason" rows="3" placeholder="Enter reason for decision…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-submit" onclick="submitApproval()">SUBMIT DECISION</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg"/>
+</div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo" style="background:linear-gradient(135deg,#f5a623,#e05c5c)">📋</div>
+    <div>
+      <div class="hdr-title" style="background:linear-gradient(90deg,#f5a623,#ff9f50);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Grooming Dashboard</div>
+      <div class="hdr-sub">Aparna Store · HR Grooming Review</div>
+    </div>
+  </div>
+  <nav class="hdr-nav">
+    <div class="grp">
+      <span class="glbl">✂️ Grooming</span>
+      <a href="grooming_form.html">➕ Entry</a>
+      <a href="grooming_approval.html" class="active">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">⚠️ Indiscipline</span>
+      <a href="indiscipline_form.html">➕ Entry</a>
+      <a href="indiscipline_approval.html">📋 Dashboard</a>
+    </div>
+    <div class="sep"></div>
+    <div class="grp">
+      <span class="glbl">🏪 VM</span>
+      <a href="vm_form.html">➕ Entry</a>
+      <a href="vm_approval.html">📋 Dashboard</a>
+    </div>
+  
+    <div class="sep"></div>
+    <a href="kpi_dashboard.html">🏆 KPI</a>
+  </nav>
+</header>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat all">    <div class="stat-num" id="statAll">0</div><div class="stat-lbl">Total Records</div></div>
+  <div class="stat pending"><div class="stat-num" id="statPending">0</div><div class="stat-lbl">Pending Review</div></div>
+  <div class="stat approved"><div class="stat-num" id="statApproved">0</div><div class="stat-lbl">Approved</div></div>
+  <div class="stat rejected"><div class="stat-num" id="statRejected">0</div><div class="stat-lbl">Not Approved</div></div>
+</div>
+
+<!-- FILTER TABS -->
+<div class="filter-bar">
+  <button class="tab active"    onclick="setTab('all',this)">All</button>
+  <button class="tab pending"   onclick="setTab('pending',this)">⏳ Pending</button>
+  <button class="tab approved"  onclick="setTab('approved',this)">✅ Approved</button>
+  <button class="tab rejected"  onclick="setTab('rejected',this)">❌ Not Approved</button>
+  <input  class="search-box"   id="searchBox" placeholder="🔍 Search name, site, ID…" oninput="renderTable()"/>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Site</th>
+        <th>Floor</th>
+        <th>Employee</th>
+        <th>Code</th>
+        <th>Flag</th>
+        <th>Reason</th>
+        <th>Photo</th>
+        <th>Status</th>
+        <th>HR Reason</th>
+        <th>Mark</th>
+        <th>Month</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="empty" id="emptyState" style="display:none;">
+    <div class="empty-icon">📭</div>
+    <div class="empty-text">No records found</div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQpg_9FkN1v9IyWPhbTnp73kHrzC0OjEO_sKhha5Q9WLmYuJUFYke60Uunv-wHSWtC/exec";
+
+let allRecords   = [];
+let currentTab   = "all";
+let currentRow   = null;
+
+// ── INIT ─────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", loadData);
+
+async function loadData() {
+  showLoading();
+  try {
+    const r = await fetch(`${APPS_SCRIPT_URL}?action=getGroomingData`);
+    const j = await r.json();
+    allRecords = j.records || [];
+    updateStats();
+    renderTable();
+  } catch(e) {
+    showToast("❌ Failed to load data – check script URL", "error");
+  }
+  hideLoading();
+}
+
+// ── STATS ─────────────────────────────────────────────
+function updateStats() {
+  const total    = allRecords.length;
+  const pending  = allRecords.filter(r => String(r["APPROVED BY HR"]||"").toUpperCase() === "PENDING").length;
+  const approved = allRecords.filter(r => String(r["APPROVED BY HR"]||"").toUpperCase() === "YES").length;
+  const rejected = allRecords.filter(r => String(r["APPROVED BY HR"]||"").toUpperCase() === "NO").length;
+  document.getElementById("statAll").textContent      = total;
+  document.getElementById("statPending").textContent  = pending;
+  document.getElementById("statApproved").textContent = approved;
+  document.getElementById("statRejected").textContent = rejected;
+}
+
+// ── FILTER + RENDER ───────────────────────────────────
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  renderTable();
+}
+
+function renderTable() {
+  const search = document.getElementById("searchBox").value.toLowerCase();
+  let rows = allRecords;
+
+  // Tab filter
+  if (currentTab === "pending")
+    rows = rows.filter(r => String(r["APPROVED BY HR"]||"").toUpperCase() === "PENDING");
+  else if (currentTab === "approved")
+    rows = rows.filter(r => String(r["APPROVED BY HR"]||"").toUpperCase() === "YES");
+  else if (currentTab === "rejected")
+    rows = rows.filter(r => String(r["APPROVED BY HR"]||"").toUpperCase() === "NO");
+
+  // Search
+  if (search)
+    rows = rows.filter(r =>
+      String(r.ID||"").toLowerCase().includes(search) ||
+      String(r.NAME||"").toLowerCase().includes(search) ||
+      String(r["SITE NAME"]||"").toLowerCase().includes(search) ||
+      String(r.CODE||"").toLowerCase().includes(search)
+    );
+
+  const tbody = document.getElementById("tableBody");
+  const empty = document.getElementById("emptyState");
+
+  if (!rows.length) {
+    tbody.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  tbody.innerHTML = rows.map(r => {
+    const status  = String(r["APPROVED BY HR"]||"PENDING").toUpperCase();
+    const flagCls = r["GROOMING FLAG"]==="RED" ? "badge-red" : "badge-green";
+    let statBadge = "";
+    if (status === "YES")     statBadge = `<span class="badge badge-green">✅ Approved</span>`;
+    else if (status === "NO") statBadge = `<span class="badge badge-red">❌ Rejected</span>`;
+    else                      statBadge = `<span class="badge badge-yellow">⏳ Pending</span>`;
+
+    const photoUrl = String(r["PHOTO URL"]||"");
+    const photoCell = photoUrl.startsWith("http")
+      ? `<img src="${photoUrl}" class="photo-thumb" onclick="openLightbox('${photoUrl}')" title="View photo"/>`
+      : `<div class="no-photo" title="No photo">📷</div>`;
+
+    const markCell = Number(r["MARK"]) === 1
+      ? `<span class="badge badge-green">1</span>`
+      : `<span class="badge badge-gray">0</span>`;
+
+    const actionCell = (status === "PENDING")
+      ? `<div style="display:flex;gap:6px;">
+           <button class="act-btn act-approve" onclick='openModal(${JSON.stringify(r)})'>✅ Review</button>
+         </div>`
+      : `<span class="act-done" title="Decision recorded">✔️</span>`;
+
+    const dateStr = r["DATE"] ? new Date(r["DATE"]).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—";
+
+    return `<tr>
+      <td style="color:var(--accent);font-weight:700;">${r["ID"]||""}</td>
+      <td style="white-space:nowrap;">${dateStr}</td>
+      <td>${r["SITE NAME"]||""}</td>
+      <td>${r["FLOOR"]||""}</td>
+      <td style="font-weight:600;">${r["NAME"]||""}</td>
+      <td style="color:var(--muted);">${r["CODE"]||""}</td>
+      <td><span class="badge ${flagCls}">${r["GROOMING FLAG"]||""}</span></td>
+      <td style="max-width:140px;word-break:break-word;">${r["REASON"]||""}</td>
+      <td>${photoCell}</td>
+      <td>${statBadge}</td>
+      <td style="max-width:160px;color:var(--muted);font-size:12px;">${r["HR REASON"]||"—"}</td>
+      <td>${markCell}</td>
+      <td style="white-space:nowrap;">${r["MONTH_YEAR"]||""}</td>
+      <td>${actionCell}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── MODAL ─────────────────────────────────────────────
+function openModal(record) {
+  currentRow = record;
+  const photoUrl = String(record["PHOTO URL"]||"");
+  const modalPhoto = document.getElementById("modalPhoto");
+  if (photoUrl.startsWith("http")) {
+    modalPhoto.src = photoUrl;
+    modalPhoto.style.display = "block";
+  } else {
+    modalPhoto.style.display = "none";
+  }
+
+  document.getElementById("modalEmpInfo").innerHTML = `
+    <div class="modal-emp-row"><span class="modal-emp-key">Record</span><span style="color:var(--accent);font-weight:700;">${record.ID}</span></div>
+    <div class="modal-emp-row"><span class="modal-emp-key">Employee</span><span>${record.NAME} (${record.CODE})</span></div>
+    <div class="modal-emp-row"><span class="modal-emp-key">Site / Floor</span><span>${record["SITE NAME"]} / ${record.FLOOR}</span></div>
+    <div class="modal-emp-row"><span class="modal-emp-key">Flag</span>
+      <span class="badge ${record["GROOMING FLAG"]==="RED"?"badge-red":"badge-green"}">${record["GROOMING FLAG"]}</span>
+    </div>
+    <div class="modal-emp-row"><span class="modal-emp-key">Reason</span><span>${record.REASON}</span></div>
+    ${record.COMMENTS ? `<div class="modal-emp-row"><span class="modal-emp-key">Comments</span><span>${record.COMMENTS}</span></div>` : ""}
+  `;
+
+  document.getElementById("modalDecision").value = "";
+  document.getElementById("modalReason").value   = "";
+  document.getElementById("approvalModal").classList.add("show");
+}
+
+function closeModal() {
+  document.getElementById("approvalModal").classList.remove("show");
+  currentRow = null;
+}
+
+async function submitApproval() {
+  const decision = document.getElementById("modalDecision").value;
+  const hrReason = document.getElementById("modalReason").value.trim();
+  if (!decision) { showToast("⚠️ Please select a decision", "error"); return; }
+
+  const payload = {
+    action      : "approveRecord",
+    row         : currentRow["_row"],
+    approvedByHR: decision,
+    hrReason    : hrReason
+  };
+
+  const btn = document.querySelector(".modal-submit");
+  btn.disabled = true; btn.textContent = "Submitting…";
+
+  try {
+    const r = await fetch(APPS_SCRIPT_URL, { method:"POST", redirect:"follow", headers:{"Content-Type":"text/plain"}, body:JSON.stringify(payload) });
+    const text = await r.text();
+    let j; try{j=JSON.parse(text);}catch(pe){showToast("❌ Server error: "+text.substring(0,60),"error");btn.disabled=false;btn.textContent="SUBMIT DECISION";return;}
+    if (j.success) {
+      showToast(`✅ Decision recorded! Email sent to admin.`, "success");
+      closeModal();
+      await loadData();
+    } else {
+      showToast("❌ Failed: " + (j.error||"Unknown"), "error");
+    }
+  } catch(e) {
+    showToast("❌ Network error: "+e.message, "error");
+  }
+  btn.disabled = false; btn.textContent = "SUBMIT DECISION";
+}
+
+// ── LIGHTBOX ──────────────────────────────────────────
+function openLightbox(url) {
+  document.getElementById("lightboxImg").src = url;
+  document.getElementById("lightbox").classList.add("show");
+}
+function closeLightbox() {
+  document.getElementById("lightbox").classList.remove("show");
+}
+
+// ── UI HELPERS ────────────────────────────────────────
+function showLoading() { document.getElementById("loadingWrap").classList.add("show"); }
+function hideLoading() { document.getElementById("loadingWrap").classList.remove("show"); }
+
+let toastTimer;
+function showToast(msg, type="success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 4500);
+}
+
+// Close modal on overlay click
+document.getElementById("approvalModal").addEventListener("click", function(e){
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
